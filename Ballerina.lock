@@ -1,7 +1,7 @@
 org_name = "hemikak"
 version = "1.0.0"
 lockfile_version = "1.0.0"
-ballerina_version = "1.0.2"
+ballerina_version = "1.0.1"
 
 [[imports."hemikak/smtp:1.0.0"]]
 org_name = "ballerinax"

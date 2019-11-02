@@ -2,6 +2,11 @@
 org-name = "hemikak"
 version = "1.0.0"
 
+license= ["Apache 2.0"]
+authors= ["Hemika Kodikara"]
+keywords= ["smtp", "email"]
+repository= "https://github.com/hemikak/smtp"
+
 [platform]
 target = "java8"
 
@@ -11,3 +16,4 @@ target = "java8"
   path = "libs/smtp-authenticator-1.0.0.jar"
   groupId = "org.hemikak.smtp"
   modules = ["smtp"]
+  

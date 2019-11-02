@@ -1,5 +1,4 @@
-Prints "Hello World!" with a main function.
-[//]: # (above is the module summary)
+SMTP Library to send Emails.
 
 # Module Overview
-Prints "Hello World!" as the output to the command line using a main function.
+A java native library that allows you to send email with SMTP protocol.

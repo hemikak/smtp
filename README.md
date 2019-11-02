@@ -1,2 +1,6 @@
-# smtp
-An SMTP library to send emails using ballerina
+# hemikak/smtp
+
+> SMTP Library to send Emails.
+
+## Module Overview
+A ballerina library that allows you to send email with SMTP protocol.
