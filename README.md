@@ -1,4 +1,4 @@
-# hemikak/smtp
+# hemika/smtp
 
 > SMTP Library to send Emails.
 
