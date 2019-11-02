@@ -51,11 +51,11 @@ function setMimeMessageSentDate(handle receiver, handle date) returns error? = @
 
 public function messageTypeTo() returns handle = @java:FieldGet {
     name: "TO",
-    class: "javax.mail.Message.RecipientType"
+    class: "javax.mail.Message$RecipientType"
 } external;
 
 function setMimeMessageRecipients(handle receiver, handle reciepientType, handle addresses) returns error? = @java:Method {
     name: "setRecipients",
     class: "javax.mail.internet.MimeMessage",
-    paramTypes: ["javax.mail.Message.RecipientType", { class: "javax.mail.Address", dimensions: 1 }]
+    paramTypes: ["javax.mail.Message$RecipientType", { class: "javax.mail.Address", dimensions: 1 }]
 } external;

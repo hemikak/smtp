@@ -13,27 +13,50 @@
 // limitations under the License.
 
 import ballerinax/java;
-import ballerina/lang.'string as lstring;
+import ballerinax/java.arrays as jarrays;
 
+# Authenticator for the SMTP session.
+# 
+# + username - Username for the session.
+# + password - Password for the session.
 public type Authentictor record {|
     string username;
     string password;
 |};
 
+# Message to send on top of SMTP.
+# 
+# + 'from - Email from.
+# + to - Receiver.
+# + subject - Email subject.
+# + content - Content of the email.
 public type Message record {|
     string 'from;
-    string[] to;
+    string to;
     string subject;
     string content;
 |};
 
+# SMTP session to send emails.
 public type Session object {
     private handle jSession;
-    function __init(string host, int port, Authentictor? authenticator = (), string? password = ()) returns error? {
+    # Initialize and connect to an SMTP library.
+    # 
+    # + host - SMTP host.
+    # + port - SMTP port.
+    # + authenticator - Authentication to give username and password.
+    # + properties - Java properties for the SMTP connection.
+    function __init(string host, int port, Authentictor? authenticator = (), map<string>? properties = ()) returns error? {
         handle jProperties = newProperties();
-        handle jStringHost = java:fromString(host);
-        _ = putStringProperty(jProperties, java:fromString("mail.smtp.host"), jStringHost);
+        _ = putStringProperty(jProperties, java:fromString("mail.smtp.host"), java:fromString(host));
         _ = putIntegerProperty(jProperties, java:fromString("mail.smtp.port"), port);
+
+        if (properties is map<string>) {
+            properties.entries().forEach(function ([string, string] prop) {
+                [string, string] [key, value] = prop;
+                _ = putStringProperty(jProperties, java:fromString(key), java:fromString(value));
+            });
+        }
 
         handle jAuthenticator = java:createNull();
         if (authenticator is Authentictor) {
@@ -45,15 +68,28 @@ public type Session object {
         return connectTransport(jTransport);
     }
 
+    # Send an email over the wire
+    # 
+    # + message - The email message.
+    # + return - Error if occurrs.
     function sendMessage(Message message) returns error? {
         handle jMimeMessage = newMimeMessage(self.jSession);
+
         check setMimeMessageContent(jMimeMessage, java:fromString(message.content), java:fromString("text/html; charset=utf-8"));
+
         check setMimeMessageFrom(jMimeMessage, check newInternetAddress(java:fromString(message.'from)));
-        check setMimeMessageReplyTo(jMimeMessage, check parseInternetAddress(java:fromString(message.'from), false));
+
+        handle replyToArray = jarrays:newInstance(check java:getClass("javax.mail.internet.InternetAddress"), 1);
+        jarrays:set(replyToArray, 0, check newInternetAddress(java:fromString(message.'from)));
+        check setMimeMessageReplyTo(jMimeMessage, replyToArray);
+
         check setMimeMessageSubject(jMimeMessage, java:fromString(message.subject), java:fromString("UTF-8"));
+
         check setMimeMessageSentDate(jMimeMessage, newDate());
-        string toAddresses = lstring:'join(",", ...message.to);
-        check setMimeMessageRecipients(jMimeMessage, messageTypeTo(), check parseInternetAddress(java:fromString(toAddresses), false));
+
+        handle recipientArray = jarrays:newInstance(check java:getClass("javax.mail.internet.InternetAddress"), 1);
+        jarrays:set(recipientArray, 0, check newInternetAddress(java:fromString(message.to)));
+        check setMimeMessageRecipients(jMimeMessage, messageTypeTo(), recipientArray);
         check sendTransport(jMimeMessage);
     }
 };
