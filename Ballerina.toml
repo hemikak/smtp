@@ -1,0 +1,13 @@
+[project]
+org-name = "hemikak"
+version = "1.0.0"
+
+[platform]
+target = "java8"
+
+  [[platform.libraries]]
+  artifactId = "smtp-authenticator"
+  version = "1.0.0"
+  path = "libs/smtp-authenticator-1.0.0.jar"
+  groupId = "org.hemikak.smtp"
+  modules = ["smtp"]
