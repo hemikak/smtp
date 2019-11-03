@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/hemikak/smtp.svg?branch=master)](https://travis-ci.com/hemikak/smtp)
+
 # hemikak/smtp
 SMTP Library to send Emails.
 
