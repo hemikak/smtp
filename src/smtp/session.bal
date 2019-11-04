@@ -72,7 +72,7 @@ public type Session object {
     # 
     # + message - The email message.
     # + return - Error if occurrs.
-    function sendMessage(Message message) returns error? {
+    public function sendMessage(Message message) returns error? {
         handle jMimeMessage = newMimeMessage(self.jSession);
 
         check setMimeMessageContent(jMimeMessage, java:fromString(message.content), java:fromString("text/html; charset=utf-8"));
