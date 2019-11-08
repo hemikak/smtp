@@ -5,16 +5,16 @@ A ballerina library that allows you to send email via SMTP protocol. This module
 
 ## Sample
 ```ballerina
-Authentictor auth = {
+smtp:Authentictor auth = {
     username: "<fill>",
     password: "<fill>"
 };
 map<string> props = {
     "mail.smtp.auth": "true"
 };
-Session smtpSession = checkpanic new("smtp.mailtrap.io", 2525, authenticator = auth, properties = props);
+smtp:Session smtpSession = checkpanic new("smtp.mailtrap.io", 2525, auth, props);
 
-Message msg = {
+smtp:Message msg = {
     'from: "bartsimpsons@mail.com",
     to: "lisasimpsons@mail.com",
     subject: "WHOA!",

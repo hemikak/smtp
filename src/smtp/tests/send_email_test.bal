@@ -28,7 +28,7 @@ public function sendEmail() {
 
     Message msg = {
         'from: "0efcb495f9-70ca25@inbox.mailtrap.io",
-        to: "foo.bar@gmail.com",
+        to: ["foo.bar@gmail.com"],
         subject: "Test Mail",
         content: "Hello"
     };

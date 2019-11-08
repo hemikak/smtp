@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import ballerina/lang.'array as larrays;
 import ballerinax/java;
 import ballerinax/java.arrays as jarrays;
 
@@ -32,7 +33,7 @@ public type Authentictor record {|
 # + content - Content of the email.
 public type Message record {|
     string 'from;
-    string to;
+    string[] to;
     string subject;
     string content;
 |};
@@ -40,13 +41,15 @@ public type Message record {|
 # SMTP session to send emails.
 public type Session object {
     private handle jSession;
+    private handle jTransport;
+
     # Initialize and connect to an SMTP library.
     # 
     # + host - SMTP host.
     # + port - SMTP port.
     # + authenticator - Authentication to give username and password.
     # + properties - Java properties for the SMTP connection.
-    function __init(string host, int port, Authentictor? authenticator = (), map<string>? properties = ()) returns error? {
+    public function __init(string host, int port, Authentictor? authenticator = (), map<string>? properties = ()) returns error? {
         handle jProperties = newProperties();
         _ = putStringProperty(jProperties, java:fromString("mail.smtp.host"), java:fromString(host));
         _ = putIntegerProperty(jProperties, java:fromString("mail.smtp.port"), port);
@@ -64,8 +67,8 @@ public type Session object {
         }
         
         self.jSession = getSessionInstance(jProperties, jAuthenticator);
-        handle jTransport = check getSessionTransport(self.jSession, java:fromString("smtp"));
-        return connectTransport(jTransport);
+        self.jTransport = check getSessionTransport(self.jSession, java:fromString("smtp"));
+        return connectTransport(self.jTransport);
     }
 
     # Send an email over the wire
@@ -75,21 +78,31 @@ public type Session object {
     public function sendMessage(Message message) returns error? {
         handle jMimeMessage = newMimeMessage(self.jSession);
 
+        // set message content
         check setMimeMessageContent(jMimeMessage, java:fromString(message.content), java:fromString("text/html; charset=utf-8"));
 
+        // set sender
         check setMimeMessageFrom(jMimeMessage, check newInternetAddress(java:fromString(message.'from)));
 
+        // set reply to
         handle replyToArray = jarrays:newInstance(check java:getClass("javax.mail.internet.InternetAddress"), 1);
         jarrays:set(replyToArray, 0, check newInternetAddress(java:fromString(message.'from)));
         check setMimeMessageReplyTo(jMimeMessage, replyToArray);
 
+        // set subject
         check setMimeMessageSubject(jMimeMessage, java:fromString(message.subject), java:fromString("UTF-8"));
 
+        // set date
         check setMimeMessageSentDate(jMimeMessage, newDate());
 
-        handle recipientArray = jarrays:newInstance(check java:getClass("javax.mail.internet.InternetAddress"), 1);
-        jarrays:set(recipientArray, 0, check newInternetAddress(java:fromString(message.to)));
+        // set to
+        handle recipientArray = jarrays:newInstance(check java:getClass("javax.mail.internet.InternetAddress"), message.to.length());
+        foreach [int, string] [index, address] in larrays:enumerate(message.to) {
+            jarrays:set(recipientArray, index, check newInternetAddress(java:fromString(address)));
+        }
         check setMimeMessageRecipients(jMimeMessage, messageTypeTo(), recipientArray);
+
+        // send message
         check sendTransport(jMimeMessage);
     }
 };
