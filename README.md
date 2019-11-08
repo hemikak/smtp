@@ -19,7 +19,7 @@ smtp:Session smtpSession = checkpanic new("smtp.mailtrap.io", 2525, auth, props)
 
 smtp:Message msg = {
     'from: "bartsimpsons@mail.com",
-    to: "lisasimpsons@mail.com",
+    to: ["lisasimpsons@mail.com"],
     subject: "WHOA!",
     content: "Hello World!"
 };
